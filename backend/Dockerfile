@@ -27,9 +27,8 @@ RUN pip install -r requirements.txt
 # Copy app source
 COPY app ./app
 
-# SQLite data lives on a mounted volume
+# SQLite data lives on a mounted volume (mount /data via host config)
 RUN mkdir -p /data
-VOLUME ["/data"]
 
 EXPOSE 8000
 
