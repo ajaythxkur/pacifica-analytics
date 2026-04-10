@@ -1,0 +1,42 @@
+# Render.com infrastructure-as-code for the Pacifica Analytics backend.
+#
+# How to use:
+#   1. Push this repo to GitHub.
+#   2. On Render → New → Blueprint → connect this repo.
+#   3. Render reads this file and creates the service + persistent disk.
+#   4. Open the new service → Environment → fill in the secret values
+#      (ELFA_API_KEY, TELEGRAM_BOT_TOKEN, TELEGRAM_BOT_USERNAME, APP_PUBLIC_URL,
+#      ALLOWED_ORIGINS). Defaults are baked in below for the non-secret ones.
+#
+# After deploy, copy the service URL into your Vercel project as BACKEND_URL.
+
+services:
+  - type: web
+    name: pacifica-analytics-backend
+    env: python
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /docs
+    autoDeploy: true
+    disk:
+      name: subscribers-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
+      - key: SUBSCRIBERS_DB_PATH
+        value: /data/subscribers.db
+      - key: ALLOWED_ORIGINS
+        sync: false        # set in dashboard, e.g. https://your-app.vercel.app
+      - key: APP_PUBLIC_URL
+        sync: false        # set in dashboard, e.g. https://your-app.vercel.app
+      - key: ELFA_API_KEY
+        sync: false        # secret
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false        # secret
+      - key: TELEGRAM_BOT_USERNAME
+        sync: false        # e.g. pacifica_analytics_bot

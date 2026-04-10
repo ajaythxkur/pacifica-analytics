@@ -1,0 +1,346 @@
+@import "tailwindcss";
+
+/* =============================================================================
+   PACIFICA ANALYTICS · THEME SYSTEM
+   -----------------------------------------------------------------------------
+   Two-layer architecture:
+
+   1. Raw palette (this section)
+      Each theme is one selector block (`:root.theme-<name>`) that defines a
+      flat set of CSS custom properties. Adding a new theme = add one block.
+      No component code changes, no utility renames.
+
+   2. Semantic tokens (`@theme` block below)
+      Tailwind utilities are mapped *once* to semantic CSS variables. Components
+      reference utilities like `bg-surface` / `text-fg-muted`; theme switching
+      happens transparently via the variable values.
+
+   All foreground / background pairings target WCAG AA contrast (>= 4.5:1 for
+   normal text, >= 3:1 for large text and non-text UI). Pairings are documented
+   in comments next to each value.
+
+   The default theme (dark) is also applied bare on `:root` so server-rendered
+   HTML has a valid theme even before the client class is set.
+   ========================================================================== */
+
+/* ---------- DARK (default) — deep navy + electric blue --------------------- */
+:root,
+:root.theme-dark {
+  color-scheme: dark;
+
+  /* Surfaces */
+  --bg:               #0a0d14;  /* page background — deep navy */
+  --surface:          #11151f;  /* cards */
+  --surface-hover:    #161b27;
+  --surface-elevated: #1a2030;  /* popovers, badges */
+  --overlay:          rgba(5, 8, 14, 0.78);
+
+  /* Borders */
+  --border-subtle:    #1a2030;
+  --border:           #232a3d;
+  --border-strong:    #2d3650;
+
+  /* Foreground (text) — all AA on bg / surface / surface-elevated */
+  --fg:               #ffffff;  /* 19.2:1 on bg */
+  --fg-muted:         #a8b0c4;  /*  9.6:1 on bg, 8.9:1 on surface */
+  --fg-subtle:        #7a8298;  /*  4.8:1 on bg, 4.5:1 on surface, 4.0:1 on elevated */
+
+  /* Brand & state — electric blue */
+  --accent:           #3b82f6;  /*  5.1:1 on bg */
+  --accent-hover:     #60a5fa;
+  --accent-fg:        #ffffff;
+  --accent-glow:      rgba(59, 130, 246, 0.28);
+  --accent-dim:       rgba(59, 130, 246, 0.10);
+
+  --success:          #10d18a;  /*  9.3:1 on bg */
+  --success-dim:      rgba(16, 209, 138, 0.12);
+  --danger:           #f87171;  /*  6.7:1 on bg */
+  --danger-dim:       rgba(248, 113, 113, 0.12);
+
+  /* Tier badges */
+  --tier-fish:        #7a8298;
+  --tier-dolphin:     #38bdf8;  /* 8.9:1 on bg */
+  --tier-shark:       #a78bfa;  /* 7.7:1 on bg */
+  --tier-whale:       #fbbf24;  /* 11.6:1 on bg */
+  --tier-leviathan:   #f87171;  /* 6.7:1 on bg */
+
+  /* Focus ring */
+  --focus-ring:       #60a5fa;
+
+  /* Radius scale */
+  --radius-sm:        0.375rem;
+  --radius:           0.625rem;
+  --radius-lg:        0.875rem;
+}
+
+/* ---------- LIGHT — slate + indigo blue ------------------------------------ */
+:root.theme-light {
+  color-scheme: light;
+
+  /* Surfaces */
+  --bg:               #ffffff;
+  --surface:          #f8fafc;
+  --surface-hover:    #f1f5f9;
+  --surface-elevated: #e8edf4;
+  --overlay:          rgba(15, 23, 42, 0.55);
+
+  /* Borders */
+  --border-subtle:    #eef2f7;
+  --border:           #d8dfea;
+  --border-strong:    #b3bccd;
+
+  /* Foreground — all AA on bg / surface / surface-elevated */
+  --fg:               #0f172a;  /* 17.9:1 on bg */
+  --fg-muted:         #475569;  /*  7.6:1 on bg, 7.1:1 on surface */
+  --fg-subtle:        #64748b;  /*  5.0:1 on bg, 4.7:1 on surface, 4.5:1 on elevated */
+
+  /* Brand & state — darker blue for contrast on white */
+  --accent:           #2563eb;  /*  5.6:1 on bg */
+  --accent-hover:     #1d4ed8;
+  --accent-fg:        #ffffff;
+  --accent-glow:      rgba(37, 99, 235, 0.20);
+  --accent-dim:       rgba(37, 99, 235, 0.08);
+
+  --success:          #047857;  /*  6.4:1 on bg */
+  --success-dim:      rgba(4, 120, 87, 0.10);
+  --danger:           #dc2626;  /*  5.9:1 on bg */
+  --danger-dim:       rgba(220, 38, 38, 0.10);
+
+  /* Tier badges */
+  --tier-fish:        #64748b;
+  --tier-dolphin:     #0369a1;  /* 6.5:1 on bg */
+  --tier-shark:       #6d28d9;  /* 7.4:1 on bg */
+  --tier-whale:       #b45309;  /* 5.1:1 on bg */
+  --tier-leviathan:   #dc2626;  /* 5.9:1 on bg */
+
+  --focus-ring:       #2563eb;
+
+  --radius-sm:        0.375rem;
+  --radius:           0.625rem;
+  --radius-lg:        0.875rem;
+}
+
+/* =============================================================================
+   TAILWIND SEMANTIC TOKEN MAPPING
+   -----------------------------------------------------------------------------
+   Maps Tailwind v4 color utilities to the semantic vars above. Defined once;
+   themes flow through automatically because each utility resolves to `var(...)`
+   at runtime.
+
+   Two sets of names exist:
+     • New semantic names (`bg`, `surface`, `fg`, `fg-muted`, `accent`, ...)
+     • Legacy aliases (`bg-primary`, `text-secondary`, `accent-glow`, ...)
+       kept so existing component code doesn't need to be rewritten.
+   ========================================================================== */
+@theme {
+  /* New semantic tokens */
+  --color-bg:               var(--bg);
+  --color-surface:          var(--surface);
+  --color-surface-hover:    var(--surface-hover);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-overlay:          var(--overlay);
+
+  --color-border-subtle:    var(--border-subtle);
+  --color-border:           var(--border);
+  --color-border-strong:    var(--border-strong);
+
+  --color-fg:               var(--fg);
+  --color-fg-muted:         var(--fg-muted);
+  --color-fg-subtle:        var(--fg-subtle);
+
+  --color-accent:           var(--accent);
+  --color-accent-hover:     var(--accent-hover);
+  --color-accent-fg:        var(--accent-fg);
+  --color-accent-glow:      var(--accent-glow);
+  --color-accent-dim:       var(--accent-dim);
+
+  --color-success:          var(--success);
+  --color-success-dim:      var(--success-dim);
+  --color-danger:           var(--danger);
+  --color-danger-dim:       var(--danger-dim);
+
+  /* Legacy aliases — keep existing utility classes working */
+  --color-bg-primary:       var(--bg);
+  --color-bg-secondary:     var(--bg);
+  --color-bg-card:          var(--surface);
+  --color-bg-card-hover:    var(--surface-hover);
+  --color-bg-elevated:      var(--surface-elevated);
+  --color-border-light:     var(--border-strong);
+  --color-text-primary:     var(--fg);
+  --color-text-secondary:   var(--fg-muted);
+  --color-text-muted:       var(--fg-subtle);
+  --color-green:            var(--success);
+  --color-green-dim:        var(--success-dim);
+  --color-red:              var(--danger);
+  --color-red-dim:          var(--danger-dim);
+
+  /* Tier badges */
+  --color-tier-fish:        var(--tier-fish);
+  --color-tier-dolphin:     var(--tier-dolphin);
+  --color-tier-shark:       var(--tier-shark);
+  --color-tier-whale:       var(--tier-whale);
+  --color-tier-leviathan:   var(--tier-leviathan);
+
+  /* Fonts */
+  --font-sans: var(--font-sans-display), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-jetbrains), "Fira Code", ui-monospace, monospace;
+}
+
+/* =============================================================================
+   BASE STYLES
+   ========================================================================== */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+html, body {
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Form controls don't inherit font by default in any browser */
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
+}
+
+::selection {
+  background: var(--accent-glow);
+  color: var(--fg);
+}
+
+/* Focus styles
+   Inputs/textareas/selects suppress the hard outline because their border
+   color already changes on focus (via Tailwind `focus:border-accent`).
+   A soft ring shadow is added for visibility without the harsh outline.
+   Buttons / links keep the keyboard-only :focus-visible outline. */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* =============================================================================
+   COMPONENT UTILITIES
+   ========================================================================== */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+}
+.card-hover:hover {
+  background: var(--surface-hover);
+  border-color: var(--border);
+}
+
+.glow-green {
+  box-shadow:
+    0 0 30px var(--success-dim),
+    inset 0 0 30px var(--success-dim);
+}
+.glow-red {
+  box-shadow:
+    0 0 30px var(--danger-dim),
+    inset 0 0 30px var(--danger-dim);
+}
+.glow-accent {
+  box-shadow: 0 0 40px var(--accent-glow);
+}
+
+.neon-border:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 20px var(--accent-dim);
+}
+
+.text-glow {
+  text-shadow:
+    0 0 10px var(--accent-glow),
+    0 0 40px var(--accent-dim);
+}
+
+.row-hover:hover {
+  background: var(--accent-dim);
+}
+
+/* Subtle gradient backdrop used on hero sections */
+.hero-gradient {
+  background:
+    radial-gradient(ellipse at top, var(--accent-dim), transparent 60%),
+    radial-gradient(ellipse at bottom, var(--accent-glow) 0%, transparent 70%);
+}
+
+/* Pulse animation */
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.3; }
+}
+.pulse-live {
+  animation: pulse-live 1.5s ease-in-out infinite;
+}
+
+/* CSS fade-in (replaces framer-motion for first paint) */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in {
+  animation: fade-in 0.25s ease-out both;
+}
+.fade-in-stagger > * {
+  opacity: 0;
+  animation: fade-in 0.3s ease-out both;
+}
+.fade-in-stagger > *:nth-child(1)  { animation-delay: 0.00s; }
+.fade-in-stagger > *:nth-child(2)  { animation-delay: 0.03s; }
+.fade-in-stagger > *:nth-child(3)  { animation-delay: 0.06s; }
+.fade-in-stagger > *:nth-child(4)  { animation-delay: 0.09s; }
+.fade-in-stagger > *:nth-child(5)  { animation-delay: 0.12s; }
+.fade-in-stagger > *:nth-child(6)  { animation-delay: 0.15s; }
+.fade-in-stagger > *:nth-child(7)  { animation-delay: 0.18s; }
+.fade-in-stagger > *:nth-child(8)  { animation-delay: 0.21s; }
+.fade-in-stagger > *:nth-child(9)  { animation-delay: 0.24s; }
+.fade-in-stagger > *:nth-child(10) { animation-delay: 0.27s; }
+.fade-in-stagger > *:nth-child(n+11) { animation-delay: 0.30s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-in,
+  .fade-in-stagger > *,
+  .pulse-live {
+    animation: none;
+  }
+}
